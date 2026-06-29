@@ -1,0 +1,78 @@
+{
+  "name": "Neon",
+  "author": "ConkyDroid",
+  "version": 1,
+  "refreshMs": 1000,
+  "widgets": [
+    {
+      "type": "text",
+      "id": "clock",
+      "x": 20, "y": 40,
+      "format": "{datetime}",
+      "fontSize": 24,
+      "color": "#00FF88",
+      "zIndex": 0
+    },
+    {
+      "type": "text",
+      "id": "cpu_label",
+      "x": 20, "y": 90,
+      "format": "CPU: {cpu_usage}%",
+      "fontSize": 14,
+      "color": "#CCCCCC",
+      "zIndex": 0
+    },
+    {
+      "type": "bar",
+      "id": "cpu_bar",
+      "x": 20, "y": 110,
+      "width": 200, "height": 8,
+      "source": "cpu_raw",
+      "fgColor": "#FF4444",
+      "bgColor": "#333333",
+      "max": 1.0,
+      "zIndex": 0
+    },
+    {
+      "type": "text",
+      "id": "mem_label",
+      "x": 20, "y": 135,
+      "format": "RAM: {mem_usage}%",
+      "fontSize": 14,
+      "color": "#CCCCCC",
+      "zIndex": 0
+    },
+    {
+      "type": "bar",
+      "id": "mem_bar",
+      "x": 20, "y": 155,
+      "width": 200, "height": 8,
+      "source": "mem_raw",
+      "fgColor": "#4488FF",
+      "bgColor": "#333333",
+      "max": 1.0,
+      "zIndex": 0
+    },
+    {
+      "type": "text",
+      "id": "net_label",
+      "x": 20, "y": 180,
+      "format": "▼ {net_rx}  ▲ {net_tx}",
+      "fontSize": 14,
+      "color": "#CCCCCC",
+      "zIndex": 0
+    },
+    {
+      "type": "graph",
+      "id": "cpu_graph",
+      "x": 20, "y": 210,
+      "width": 260, "height": 50,
+      "source": "cpu_raw",
+      "lineColor": "#FF4444",
+      "fillColor": "#22FF4444",
+      "history": 60,
+      "max": 1.0,
+      "zIndex": 0
+    }
+  ]
+}

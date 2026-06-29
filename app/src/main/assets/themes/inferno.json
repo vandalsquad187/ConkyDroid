@@ -1,0 +1,154 @@
+{
+  "name": "Inferno",
+  "author": "ConkyDroid",
+  "version": 1,
+  "refreshMs": 1000,
+  "globalColor": "#ff4400",
+  "widgets": [
+    {
+      "type": "text",
+      "id": "title",
+      "x": 80, "y": 15, "zIndex": 0,
+      "format": "INFERNO",
+      "fontSize": 24,
+      "color": "#ff4400"
+    },
+    {
+      "type": "hline",
+      "id": "h1",
+      "x": 5, "y": 40, "zIndex": 0,
+      "length": 310,
+      "color": "#ff4400",
+      "strokeWidth": 3
+    },
+    {
+      "type": "text",
+      "id": "clock",
+      "x": 15, "y": 60, "zIndex": 0,
+      "format": "{time}",
+      "fontSize": 48,
+      "color": "#ff6622"
+    },
+    {
+      "type": "text",
+      "id": "date",
+      "x": 15, "y": 108, "zIndex": 0,
+      "format": "{date}",
+      "fontSize": 14,
+      "color": "#ffaa88"
+    },
+    {
+      "type": "hline",
+      "id": "h2",
+      "x": 5, "y": 125, "zIndex": 0,
+      "length": 310,
+      "color": "#66ff4400",
+      "strokeWidth": 1
+    },
+    {
+      "type": "vline",
+      "id": "v1",
+      "x": 155, "y": 140, "zIndex": 0,
+      "length": 80,
+      "color": "#44ff4400",
+      "strokeWidth": 1
+    },
+    {
+      "type": "text",
+      "id": "cpu_lbl",
+      "x": 15, "y": 145, "zIndex": 0,
+      "format": "CPU  {cpu_usage}%",
+      "fontSize": 16,
+      "color": "#ff6622"
+    },
+    {
+      "type": "bar",
+      "id": "cpu_bar",
+      "x": 15, "y": 165, "zIndex": 0,
+      "width": 130, "height": 14,
+      "source": "cpu_raw",
+      "fgColor": "#ff2200",
+      "bgColor": "#331100",
+      "max": 1.0
+    },
+    {
+      "type": "text",
+      "id": "ram_lbl",
+      "x": 160, "y": 145, "zIndex": 0,
+      "format": "RAM  {mem_usage}%",
+      "fontSize": 16,
+      "color": "#ff6622"
+    },
+    {
+      "type": "bar",
+      "id": "ram_bar",
+      "x": 160, "y": 165, "zIndex": 0,
+      "width": 130, "height": 14,
+      "source": "mem_raw",
+      "fgColor": "#ff8800",
+      "bgColor": "#331100",
+      "max": 1.0
+    },
+    {
+      "type": "text",
+      "id": "battery_lbl",
+      "x": 15, "y": 200, "zIndex": 0,
+      "format": "BAT  {battery}%  [{battery_status}]",
+      "fontSize": 14,
+      "color": "#ff6622"
+    },
+    {
+      "type": "bar",
+      "id": "battery_bar",
+      "x": 15, "y": 220, "zIndex": 0,
+      "width": 290, "height": 10,
+      "source": "battery_raw",
+      "fgColor": "#ff4400",
+      "bgColor": "#331100",
+      "max": 1.0
+    },
+    {
+      "type": "graph",
+      "id": "cpu_graph",
+      "x": 15, "y": 245, "zIndex": 0,
+      "width": 290, "height": 55,
+      "source": "cpu_raw",
+      "lineColor": "#ff2200",
+      "fillColor": "#22ff2200",
+      "history": 60,
+      "max": 1.0
+    },
+    {
+      "type": "text",
+      "id": "net_lbl",
+      "x": 15, "y": 315, "zIndex": 0,
+      "format": "\u25bc {net_rx}  \u25b2 {net_tx}",
+      "fontSize": 13,
+      "color": "#ffaa88"
+    },
+    {
+      "type": "text",
+      "id": "storage_lbl",
+      "x": 15, "y": 338, "zIndex": 0,
+      "format": "STO {storage_usage}%  ({storage_avail} free)",
+      "fontSize": 13,
+      "color": "#ffaa88"
+    },
+    {
+      "type": "hline",
+      "id": "h3",
+      "x": 5, "y": 360, "zIndex": 0,
+      "length": 310,
+      "color": "#ff4400",
+      "strokeWidth": 2
+    },
+    {
+      "type": "text",
+      "id": "footer",
+      "x": 80, "y": 378, "zIndex": 0,
+      "format": "\u25c6 gaming mode \u25c6",
+      "fontSize": 14,
+      "color": "#ff6622"
+    }
+  ]
+}

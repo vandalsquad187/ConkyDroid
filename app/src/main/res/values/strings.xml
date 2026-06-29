@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ConkyDroid</string>
+    <string name="start_overlay">Overlay starten</string>
+    <string name="stop_overlay">Overlay stoppen</string>
+    <string name="overlay_permission_required">Overlay-Berechtigung erforderlich</string>
+    <string name="grant_permission">Berechtigung erteilen</string>
+    <string name="overlay_running">ConkyDroid läuft</string>
+</resources>

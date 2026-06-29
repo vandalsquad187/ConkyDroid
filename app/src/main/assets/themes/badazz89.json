@@ -1,0 +1,196 @@
+{
+  "name": "Badazz89",
+  "author": "h4ck3r",
+  "version": 1,
+  "refreshMs": 750,
+  "globalColor": "#00ff00",
+  "widgets": [
+    {
+      "type": "hline",
+      "id": "border_out_top",
+      "x": 4, "y": 0, "zIndex": 0,
+      "length": 158,
+      "color": "#00ff00",
+      "strokeWidth": 2
+    },
+    {
+      "type": "hline",
+      "id": "border_in_top",
+      "x": 7, "y": 3, "zIndex": 0,
+      "length": 152,
+      "color": "#00ff00",
+      "strokeWidth": 1
+    },
+    {
+      "type": "vline",
+      "id": "border_out_left",
+      "x": 4, "y": 0, "zIndex": 0,
+      "length": 180,
+      "color": "#00ff00",
+      "strokeWidth": 2
+    },
+    {
+      "type": "vline",
+      "id": "border_in_left",
+      "x": 7, "y": 0, "zIndex": 0,
+      "length": 180,
+      "color": "#00ff00",
+      "strokeWidth": 1
+    },
+    {
+      "type": "vline",
+      "id": "border_out_right",
+      "x": 162, "y": 0, "zIndex": 0,
+      "length": 180,
+      "color": "#00ff00",
+      "strokeWidth": 2
+    },
+    {
+      "type": "vline",
+      "id": "border_in_right",
+      "x": 159, "y": 0, "zIndex": 0,
+      "length": 180,
+      "color": "#00ff00",
+      "strokeWidth": 1
+    },
+    {
+      "type": "hline",
+      "id": "border_out_bot",
+      "x": 4, "y": 180, "zIndex": 0,
+      "length": 158,
+      "color": "#00ff00",
+      "strokeWidth": 2
+    },
+    {
+      "type": "hline",
+      "id": "border_in_bot",
+      "x": 7, "y": 177, "zIndex": 0,
+      "length": 152,
+      "color": "#00ff00",
+      "strokeWidth": 1
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "x": 14, "y": 8, "zIndex": 1,
+      "format": "\u2554 B A D A Z Z 8 9 \u2557",
+      "fontSize": 10,
+      "color": "#00ff00"
+    },
+    {
+      "type": "text",
+      "id": "clock",
+      "x": 14, "y": 20, "zIndex": 1,
+      "format": "{time}",
+      "fontSize": 20,
+      "color": "#33ff33"
+    },
+    {
+      "type": "text",
+      "id": "date",
+      "x": 14, "y": 40, "zIndex": 1,
+      "format": "{date}",
+      "fontSize": 9,
+      "color": "#88ff88"
+    },
+    {
+      "type": "text",
+      "id": "cpu_lbl",
+      "x": 14, "y": 50, "zIndex": 1,
+      "format": "CPU {cpu_usage}%  @{cpu_freq}",
+      "fontSize": 9,
+      "color": "#00ff00"
+    },
+    {
+      "type": "bar",
+      "id": "cpu_bar",
+      "x": 14, "y": 60, "zIndex": 1,
+      "width": 140, "height": 5,
+      "source": "cpu_raw",
+      "fgColor": "#00ff00",
+      "bgColor": "#003300",
+      "max": 1.0
+    },
+    {
+      "type": "text",
+      "id": "ram_lbl",
+      "x": 14, "y": 70, "zIndex": 1,
+      "format": "RAM {mem_usage}%  {mem_used}/{mem_total}",
+      "fontSize": 9,
+      "color": "#88ff88"
+    },
+    {
+      "type": "bar",
+      "id": "ram_bar",
+      "x": 14, "y": 80, "zIndex": 1,
+      "width": 140, "height": 5,
+      "source": "mem_raw",
+      "fgColor": "#00ccff",
+      "bgColor": "#002233",
+      "max": 1.0
+    },
+    {
+      "type": "graph",
+      "id": "cpu_graph",
+      "x": 14, "y": 92, "zIndex": 1,
+      "width": 140, "height": 25,
+      "source": "cpu_raw",
+      "lineColor": "#00ff00",
+      "fillColor": "#0800ff00",
+      "history": 30,
+      "max": 1.0
+    },
+    {
+      "type": "text",
+      "id": "bat_lbl",
+      "x": 14, "y": 124, "zIndex": 1,
+      "format": "BAT {battery}%  {battery_status}",
+      "fontSize": 9,
+      "color": "#00ff00"
+    },
+    {
+      "type": "bar",
+      "id": "battery_bar",
+      "x": 14, "y": 134, "zIndex": 1,
+      "width": 140, "height": 5,
+      "source": "battery_raw",
+      "fgColor": "#00ff88",
+      "bgColor": "#003322",
+      "max": 1.0
+    },
+    {
+      "type": "text",
+      "id": "sto_lbl",
+      "x": 14, "y": 144, "zIndex": 1,
+      "format": "STO {storage_usage}%  {storage_avail} free",
+      "fontSize": 9,
+      "color": "#88ff88"
+    },
+    {
+      "type": "bar",
+      "id": "storage_bar",
+      "x": 14, "y": 154, "zIndex": 1,
+      "width": 140, "height": 5,
+      "source": "storage_raw",
+      "fgColor": "#00ff00",
+      "bgColor": "#003300",
+      "max": 1.0
+    },
+    {
+      "type": "text",
+      "id": "net_line",
+      "x": 14, "y": 164, "zIndex": 1,
+      "format": "\u25bc{net_rx}  \u25b2{net_tx}",
+      "fontSize": 9,
+      "color": "#88ff88"
+    },
+    {
+      "type": "text",
+      "id": "footer",
+      "x": 50, "y": 173, "zIndex": 1,
+      "format": "conkydroid",
+      "fontSize": 7,
+      "color": "#005500"
+    }
+  ]
+}

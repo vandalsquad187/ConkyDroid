@@ -1,0 +1,87 @@
+{
+  "name": "Minimal",
+  "author": "ConkyDroid",
+  "version": 1,
+  "refreshMs": 1000,
+  "globalScale": 1.2,
+  "widgets": [
+    {
+      "type": "text",
+      "id": "clock",
+      "x": 20, "y": 40, "zIndex": 0,
+      "format": "{datetime}",
+      "fontSize": 32,
+      "color": "#00ff88"
+    },
+    {
+      "type": "hline",
+      "id": "h1",
+      "x": 10, "y": 78, "zIndex": 0,
+      "length": 250,
+      "color": "#44ffffff",
+      "strokeWidth": 1
+    },
+    {
+      "type": "text",
+      "id": "cpu_label",
+      "x": 20, "y": 90, "zIndex": 0,
+      "format": "CPU: {cpu_usage}%",
+      "fontSize": 14,
+      "color": "#cccccc"
+    },
+    {
+      "type": "bar",
+      "id": "cpu_bar",
+      "x": 20, "y": 110, "zIndex": 0,
+      "width": 200, "height": 8,
+      "source": "cpu_raw",
+      "fgColor": "#ff4444",
+      "bgColor": "#333333",
+      "max": 1.0
+    },
+    {
+      "type": "text",
+      "id": "mem_label",
+      "x": 20, "y": 135, "zIndex": 0,
+      "format": "RAM: {mem_usage}%",
+      "fontSize": 14,
+      "color": "#cccccc"
+    },
+    {
+      "type": "bar",
+      "id": "mem_bar",
+      "x": 20, "y": 155, "zIndex": 0,
+      "width": 200, "height": 8,
+      "source": "mem_raw",
+      "fgColor": "#4488ff",
+      "bgColor": "#333333",
+      "max": 1.0
+    },
+    {
+      "type": "text",
+      "id": "battery_label",
+      "x": 20, "y": 180, "zIndex": 0,
+      "format": "Battery: {battery}%",
+      "fontSize": 14,
+      "color": "#cccccc"
+    },
+    {
+      "type": "bar",
+      "id": "battery_bar",
+      "x": 20, "y": 200, "zIndex": 0,
+      "width": 200, "height": 8,
+      "source": "battery_raw",
+      "fgColor": "#00cc66",
+      "bgColor": "#333333",
+      "max": 1.0
+    },
+    {
+      "type": "text",
+      "id": "net_label",
+      "x": 20, "y": 225, "zIndex": 0,
+      "format": "\u25bc {net_rx}  \u25b2 {net_tx}",
+      "fontSize": 14,
+      "color": "#cccccc"
+    }
+  ]
+}

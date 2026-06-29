@@ -1,0 +1,89 @@
+{
+  "name": "CPU Monitor",
+  "author": "ConkyDroid",
+  "version": 1,
+  "refreshMs": 1000,
+  "widgets": [
+    {
+      "type": "text",
+      "id": "time",
+      "x": 20, "y": 30, "zIndex": 0,
+      "format": "{time}",
+      "fontSize": 48,
+      "color": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "cpu_title",
+      "x": 20, "y": 100, "zIndex": 0,
+      "format": "CPU  {cpu_usage}%  @ {cpu_freq}",
+      "fontSize": 14,
+      "color": "#aaaaaa"
+    },
+    {
+      "type": "graph",
+      "id": "cpu_graph",
+      "x": 20, "y": 120, "zIndex": 0,
+      "width": 280, "height": 60,
+      "source": "cpu_raw",
+      "lineColor": "#ff4444",
+      "fillColor": "#22ff4444",
+      "history": 60,
+      "max": 1.0
+    },
+    {
+      "type": "bar",
+      "id": "cpu_bar_1",
+      "x": 20, "y": 190, "zIndex": 0,
+      "width": 280, "height": 8,
+      "source": "cpu_raw",
+      "fgColor": "#ff4444",
+      "bgColor": "#222222",
+      "max": 1.0
+    },
+    {
+      "type": "text",
+      "id": "mem_title",
+      "x": 20, "y": 215, "zIndex": 0,
+      "format": "RAM  {mem_usage}%  ({mem_used}/{mem_total})",
+      "fontSize": 14,
+      "color": "#aaaaaa"
+    },
+    {
+      "type": "bar",
+      "id": "mem_bar_1",
+      "x": 20, "y": 235, "zIndex": 0,
+      "width": 280, "height": 8,
+      "source": "mem_raw",
+      "fgColor": "#4488ff",
+      "bgColor": "#222222",
+      "max": 1.0
+    },
+    {
+      "type": "text",
+      "id": "battery_title",
+      "x": 20, "y": 260, "zIndex": 0,
+      "format": "Battery  {battery}%  {battery_status}",
+      "fontSize": 14,
+      "color": "#aaaaaa"
+    },
+    {
+      "type": "bar",
+      "id": "battery_bar_1",
+      "x": 20, "y": 280, "zIndex": 0,
+      "width": 280, "height": 8,
+      "source": "battery_raw",
+      "fgColor": "#00cc66",
+      "bgColor": "#222222",
+      "max": 1.0
+    },
+    {
+      "type": "text",
+      "id": "net_title",
+      "x": 20, "y": 305, "zIndex": 0,
+      "format": "Network  \u25bc{net_rx}  \u25b2{net_tx}",
+      "fontSize": 14,
+      "color": "#aaaaaa"
+    }
+  ]
+}

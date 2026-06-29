@@ -1,0 +1,137 @@
+{
+  "name": "Neon Punx",
+  "author": "ConkyDroid",
+  "version": 1,
+  "refreshMs": 1000,
+  "globalColor": "#ff00ff",
+  "globalScale": 0.9,
+  "widgets": [
+    {
+      "type": "text",
+      "id": "clock",
+      "x": 15, "y": 25, "zIndex": 0,
+      "format": "{time}",
+      "fontSize": 42,
+      "color": "#ff00ff"
+    },
+    {
+      "type": "text",
+      "id": "date",
+      "x": 15, "y": 68, "zIndex": 0,
+      "format": "{date}",
+      "fontSize": 14,
+      "color": "#ff88ff"
+    },
+    {
+      "type": "hline",
+      "id": "h1",
+      "x": 5, "y": 90, "zIndex": 0,
+      "length": 310,
+      "color": "#ff44ff",
+      "strokeWidth": 2
+    },
+    {
+      "type": "text",
+      "id": "cpu_lbl",
+      "x": 15, "y": 105, "zIndex": 0,
+      "format": "CPU  {cpu_usage}%  @ {cpu_freq}",
+      "fontSize": 13,
+      "color": "#00ffff"
+    },
+    {
+      "type": "bar",
+      "id": "cpu_bar",
+      "x": 15, "y": 125, "zIndex": 0,
+      "width": 290, "height": 12,
+      "source": "cpu_raw",
+      "fgColor": "#ff00ff",
+      "bgColor": "#330033",
+      "max": 1.0
+    },
+    {
+      "type": "text",
+      "id": "ram_lbl",
+      "x": 15, "y": 155, "zIndex": 0,
+      "format": "RAM  {mem_usage}%  ({mem_used}/{mem_total})",
+      "fontSize": 13,
+      "color": "#00ffff"
+    },
+    {
+      "type": "bar",
+      "id": "ram_bar",
+      "x": 15, "y": 175, "zIndex": 0,
+      "width": 290, "height": 12,
+      "source": "mem_raw",
+      "fgColor": "#00ffff",
+      "bgColor": "#003333",
+      "max": 1.0
+    },
+    {
+      "type": "graph",
+      "id": "cpu_graph",
+      "x": 15, "y": 205, "zIndex": 0,
+      "width": 290, "height": 50,
+      "source": "cpu_raw",
+      "lineColor": "#ff00ff",
+      "fillColor": "#22ff00ff",
+      "history": 60,
+      "max": 1.0
+    },
+    {
+      "type": "vline",
+      "id": "v1",
+      "x": 155, "y": 270, "zIndex": 0,
+      "length": 60,
+      "color": "#44ff44ff",
+      "strokeWidth": 1
+    },
+    {
+      "type": "text",
+      "id": "battery_lbl",
+      "x": 15, "y": 275, "zIndex": 0,
+      "format": "BAT {battery}%",
+      "fontSize": 14,
+      "color": "#ff00ff"
+    },
+    {
+      "type": "text",
+      "id": "temp_lbl",
+      "x": 160, "y": 275, "zIndex": 0,
+      "format": "{battery_temp}",
+      "fontSize": 14,
+      "color": "#ff00ff"
+    },
+    {
+      "type": "text",
+      "id": "storage_lbl",
+      "x": 15, "y": 300, "zIndex": 0,
+      "format": "STO {storage_usage}%  ({storage_avail} free)",
+      "fontSize": 13,
+      "color": "#00ffff"
+    },
+    {
+      "type": "text",
+      "id": "net_lbl",
+      "x": 15, "y": 325, "zIndex": 0,
+      "format": "\u25bc {net_rx}  \u25b2 {net_tx}",
+      "fontSize": 13,
+      "color": "#00ffff"
+    },
+    {
+      "type": "hline",
+      "id": "h2",
+      "x": 5, "y": 345, "zIndex": 0,
+      "length": 310,
+      "color": "#ff44ff",
+      "strokeWidth": 1
+    },
+    {
+      "type": "text",
+      "id": "footer",
+      "x": 80, "y": 360, "zIndex": 0,
+      "format": "\u26a1 neon punx \u26a1",
+      "fontSize": 16,
+      "color": "#ff00ff"
+    }
+  ]
+}
