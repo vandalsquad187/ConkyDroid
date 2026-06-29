@@ -101,6 +101,20 @@ class MainActivity : ComponentActivity() {
                                 blockedApps = apps
                                 prefs.edit().putStringSet("blocked_apps", apps).apply()
                             }
+                            var visibilityMode by remember { mutableStateOf(
+                                prefs.getString("visibility_mode", "disabled") ?: "disabled"
+                            ) }
+                            fun saveVisibilityMode(mode: String) {
+                                visibilityMode = mode
+                                prefs.edit().putString("visibility_mode", mode).apply()
+                            }
+                            var allowedApps by remember { mutableStateOf(
+                                prefs.getStringSet("allowed_apps", emptySet()) ?: emptySet()
+                            ) }
+                            fun saveAllowed(apps: Set<String>) {
+                                allowedApps = apps
+                                prefs.edit().putStringSet("allowed_apps", apps).apply()
+                            }
                             SettingsScreen(
                                 onBack = { screen = Screen.Main },
                                 themeMode = themeMode,
@@ -111,6 +125,11 @@ class MainActivity : ComponentActivity() {
                                 blockedApps = blockedApps,
                                 onAddBlocked = { pkg -> saveBlocked(blockedApps + pkg) },
                                 onRemoveBlocked = { pkg -> saveBlocked(blockedApps - pkg) },
+                                visibilityMode = visibilityMode,
+                                onVisibilityModeChange = { saveVisibilityMode(it) },
+                                allowedApps = allowedApps,
+                                onAddAllowed = { pkg -> saveAllowed(allowedApps + pkg) },
+                                onRemoveAllowed = { pkg -> saveAllowed(allowedApps - pkg) },
                                 alpha = overlayAlpha,
                                 onAlphaChange = { a ->
                                     overlayAlpha = a

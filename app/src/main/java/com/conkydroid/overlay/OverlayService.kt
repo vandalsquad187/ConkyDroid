@@ -58,18 +58,31 @@ class OverlayService : Service() {
         blocklistJob = scope.launch {
             val prefs = applicationContext.getSharedPreferences("conkydroid", MODE_PRIVATE)
             while (isActive) {
-                val blocked = prefs.getStringSet("blocked_apps", emptySet()) ?: emptySet()
-                if (blocked.isNotEmpty()) {
-                    val fg = getForegroundPackage()
-                    if (fg != null) lastForegroundPkg = fg
-                    val checkPkg = fg ?: lastForegroundPkg
-                    val shouldHide = checkPkg != null && blocked.contains(checkPkg)
-                    overlayView?.let { v ->
-                        v.visibility = if (shouldHide) View.GONE else View.VISIBLE
+                val mode = prefs.getString("visibility_mode", "disabled") ?: "disabled"
+                var shouldHide = false
+                when (mode) {
+                    "blacklist" -> {
+                        val blocked = prefs.getStringSet("blocked_apps", emptySet()) ?: emptySet()
+                        if (blocked.isNotEmpty()) {
+                            val fg = getForegroundPackage()
+                            if (fg != null) lastForegroundPkg = fg
+                            val checkPkg = fg ?: lastForegroundPkg
+                            shouldHide = checkPkg != null && blocked.contains(checkPkg)
+                        }
                     }
-                } else {
-                    overlayView?.let { v -> v.visibility = View.VISIBLE }
+                    "whitelist" -> {
+                        val allowed = prefs.getStringSet("allowed_apps", emptySet()) ?: emptySet()
+                        if (allowed.isNotEmpty()) {
+                            val fg = getForegroundPackage()
+                            if (fg != null) lastForegroundPkg = fg
+                            val checkPkg = fg ?: lastForegroundPkg
+                            shouldHide = checkPkg == null || !allowed.contains(checkPkg)
+                        } else {
+                            shouldHide = true
+                        }
+                    }
                 }
+                overlayView?.visibility = if (shouldHide) View.GONE else View.VISIBLE
                 delay(2000)
             }
         }

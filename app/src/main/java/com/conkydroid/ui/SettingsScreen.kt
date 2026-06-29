@@ -42,6 +42,11 @@ fun SettingsScreen(
     blockedApps: Set<String>,
     onAddBlocked: (String) -> Unit,
     onRemoveBlocked: (String) -> Unit,
+    visibilityMode: String = "disabled",
+    onVisibilityModeChange: (String) -> Unit = {},
+    allowedApps: Set<String> = emptySet(),
+    onAddAllowed: (String) -> Unit = {},
+    onRemoveAllowed: (String) -> Unit = {},
     alpha: Float,
     onAlphaChange: (Float) -> Unit,
     weatherLat: String,
@@ -111,53 +116,40 @@ fun SettingsScreen(
                 }
 
                 Spacer(Modifier.height(16.dp))
-                Text("App Blacklist", style = MaterialTheme.typography.titleMedium)
-                Text("Hide overlay when these apps are in the foreground.", style = MaterialTheme.typography.bodySmall)
-                Spacer(Modifier.height(4.dp))
+                Text("App-Filter", style = MaterialTheme.typography.titleMedium)
+                Text("Lege fest, in welchen Apps das Overlay angezeigt wird.", style = MaterialTheme.typography.bodySmall)
+                Spacer(Modifier.height(8.dp))
 
-                Button(
-                    onClick = {
-                        val allApps: List<android.content.pm.ApplicationInfo> = if (android.os.Build.VERSION.SDK_INT >= 33) {
-                            pm.getInstalledApplications(android.content.pm.PackageManager.ApplicationInfoFlags.of(0))
-                        } else {
-                            @Suppress("DEPRECATION") pm.getInstalledApplications(0)
-                        }
-                        val apps = allApps
-                            .map { it.packageName to (pm.getApplicationLabel(it)?.toString() ?: it.packageName) }
-                            .filterNot { (pkg, _) -> pkg == ctx.packageName }
-                            .sortedBy { (_, label) -> label }
-                        val names = apps.map { (pkg, label) -> "$label ($pkg)" }.toTypedArray()
-                        android.app.AlertDialog.Builder(ctx)
-                            .setTitle("Add app to blacklist")
-                            .setItems(names) { _, which -> onAddBlocked(apps[which].first) }
-                            .setNegativeButton("Cancel", null)
-                            .create()
-                            .show()
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                ) { Text("+ Add App") }
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    val modes = listOf("disabled" to "Aus", "blacklist" to "Blacklist", "whitelist" to "Whitelist")
+                    for ((value, label) in modes) {
+                        Button(
+                            onClick = { onVisibilityModeChange(value) },
+                            enabled = value != visibilityMode,
+                            modifier = Modifier.weight(1f),
+                        ) { Text(label, maxLines = 1) }
+                    }
+                }
 
                 Spacer(Modifier.height(8.dp))
 
-                if (blockedApps.isEmpty()) {
-                    Text("No apps blocked.", style = MaterialTheme.typography.bodyMedium)
-                } else {
-                    val allApps2: List<android.content.pm.ApplicationInfo> = if (android.os.Build.VERSION.SDK_INT >= 33) {
-                        pm.getInstalledApplications(android.content.pm.PackageManager.ApplicationInfoFlags.of(0))
-                    } else {
-                        @Suppress("DEPRECATION") pm.getInstalledApplications(0)
+                when (visibilityMode) {
+                    "disabled" -> {
+                        Text("Overlay wird in allen Apps angezeigt.", style = MaterialTheme.typography.bodyMedium)
                     }
-                    val apps2 = allApps2.associate { it.packageName to (pm.getApplicationLabel(it)?.toString() ?: it.packageName) }
-                    for (pkg in blockedApps.sorted()) {
-                        val label = apps2[pkg] ?: pkg
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(label, modifier = Modifier.weight(1f))
-                            TextButton(onClick = { onRemoveBlocked(pkg) }) { Text("Remove") }
-                        }
+                    "blacklist" -> {
+                        Text("Overlay in diesen Apps ausblenden:", style = MaterialTheme.typography.bodySmall)
+                        Spacer(Modifier.height(4.dp))
+                        AddAppButton(ctx, pm, "Blacklist") { onAddBlocked(it) }
+                        Spacer(Modifier.height(8.dp))
+                        AppListDisplay(blockedApps, ctx, pm, "Keine Apps auf der Blacklist.") { onRemoveBlocked(it) }
+                    }
+                    "whitelist" -> {
+                        Text("Overlay nur in diesen Apps anzeigen:", style = MaterialTheme.typography.bodySmall)
+                        Spacer(Modifier.height(4.dp))
+                        AddAppButton(ctx, pm, "Whitelist") { onAddAllowed(it) }
+                        Spacer(Modifier.height(8.dp))
+                        AppListDisplay(allowedApps, ctx, pm, "Keine Apps auf der Whitelist.") { onRemoveAllowed(it) }
                     }
                 }
 
@@ -165,6 +157,62 @@ fun SettingsScreen(
                 Text("Theme files location:", style = MaterialTheme.typography.bodySmall)
                 Text("Internal Storage/Android/data/com.conkydroid/files/themes/", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
                 Spacer(Modifier.height(16.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun AddAppButton(ctx: Context, pm: PackageManager, listName: String, onAdd: (String) -> Unit) {
+    Button(
+        onClick = {
+            val allApps: List<android.content.pm.ApplicationInfo> = if (android.os.Build.VERSION.SDK_INT >= 33) {
+                pm.getInstalledApplications(android.content.pm.PackageManager.ApplicationInfoFlags.of(0))
+            } else {
+                @Suppress("DEPRECATION") pm.getInstalledApplications(0)
+            }
+            val apps = allApps
+                .map { it.packageName to (pm.getApplicationLabel(it)?.toString() ?: it.packageName) }
+                .filterNot { (pkg, _) -> pkg == ctx.packageName }
+                .sortedBy { (_, label) -> label }
+            val names = apps.map { (pkg, label) -> "$label ($pkg)" }.toTypedArray()
+            android.app.AlertDialog.Builder(ctx)
+                .setTitle("App zu $listName hinzufügen")
+                .setItems(names) { _, which -> onAdd(apps[which].first) }
+                .setNegativeButton("Abbrechen", null)
+                .create()
+                .show()
+        },
+        modifier = Modifier.fillMaxWidth(),
+    ) { Text("+ App hinzufügen") }
+}
+
+@Composable
+private fun AppListDisplay(
+    apps: Set<String>,
+    ctx: Context,
+    pm: PackageManager,
+    emptyText: String,
+    onRemove: (String) -> Unit,
+) {
+    if (apps.isEmpty()) {
+        Text(emptyText, style = MaterialTheme.typography.bodyMedium)
+    } else {
+        val allApps: List<android.content.pm.ApplicationInfo> = if (android.os.Build.VERSION.SDK_INT >= 33) {
+            pm.getInstalledApplications(android.content.pm.PackageManager.ApplicationInfoFlags.of(0))
+        } else {
+            @Suppress("DEPRECATION") pm.getInstalledApplications(0)
+        }
+        val appLabels = allApps.associate { it.packageName to (pm.getApplicationLabel(it)?.toString() ?: it.packageName) }
+        for (pkg in apps.sorted()) {
+            val label = appLabels[pkg] ?: pkg
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(label, modifier = Modifier.weight(1f))
+                TextButton(onClick = { onRemove(pkg) }) { Text("Entfernen") }
             }
         }
     }
