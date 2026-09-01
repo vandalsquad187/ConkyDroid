@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.2.1 (2026-09-01)
+
+### Behoben
+- Drag&Drop Reordering im Theme-Editor korrigiert
+- Overlay Drag/Skalierungs-Offset korrigiert
+- "Save as new Conky" funktioniert wieder korrekt
+
 ## v0.2.0 (2026-06-29)
 
 ### Neu
