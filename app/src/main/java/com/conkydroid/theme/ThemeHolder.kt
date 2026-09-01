@@ -137,6 +137,31 @@ object ThemeHolder {
     fun resetToOriginal() {
         undoStack.clear()
         _widgets.value = originalWidgets.toList()
+        offsetX = 0f
+        offsetY = 0f
+        _version.value++
+    }
+
+    fun bakedWidgets(): List<Widget> {
+        if (offsetX == 0f && offsetY == 0f) return _widgets.value
+        return _widgets.value.map { w ->
+            when (w) {
+                is Widget.Text -> w.copy(x = w.x + offsetX, y = w.y + offsetY)
+                is Widget.Bar -> w.copy(x = w.x + offsetX, y = w.y + offsetY)
+                is Widget.Graph -> w.copy(x = w.x + offsetX, y = w.y + offsetY)
+                is Widget.HLine -> w.copy(x = w.x + offsetX, y = w.y + offsetY)
+                is Widget.VLine -> w.copy(x = w.x + offsetX, y = w.y + offsetY)
+                else -> w
+            }
+        }
+    }
+
+    fun consumeOffsetAndBake() {
+        if (offsetX == 0f && offsetY == 0f) return
+        undoStack.add(_widgets.value)
+        _widgets.value = bakedWidgets()
+        offsetX = 0f
+        offsetY = 0f
         _version.value++
     }
 }

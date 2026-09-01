@@ -38,20 +38,23 @@ class ThemeRepository(private val context: Context) {
         return list
     }
 
+    private fun sanitize(name: String): String {
+        return name.lowercase().replace(Regex("[^a-z0-9]+"), "_").trim('_').ifBlank { "theme" } + ".json"
+    }
+
     fun save(name: String, json: String): Boolean {
         return try {
             val dir = getThemesDir()
             dir.mkdirs()
-            File(dir, "${name.lowercase().replace(" ", "_")}.json").writeText(json)
+            File(dir, sanitize(name)).writeText(json)
             true
         } catch (_: Exception) { false }
     }
 
     fun delete(name: String): Boolean {
         return try {
-            val f1 = File(getThemesDir(), "${name.lowercase().replace(" ", "_")}.json")
-            val f2 = File(getThemesDir(), "${name.lowercase().replace(" ", "_")}.json")
-            if (f1.exists()) { f1.delete(); true } else if (f2.exists()) { f2.delete(); true } else false
+            val f = File(getThemesDir(), sanitize(name))
+            if (f.exists()) f.delete() else false
         } catch (_: Exception) { false }
     }
 
@@ -79,7 +82,7 @@ class ThemeRepository(private val context: Context) {
     fun isUserTheme(name: String): Boolean {
         val dir = getThemesDir()
         if (!dir.exists()) return false
-        return File(dir, "${name.lowercase().replace(" ", "_")}.json").exists()
+        return File(dir, sanitize(name)).exists()
     }
 
     private fun getThemesDir(): File {

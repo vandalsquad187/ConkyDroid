@@ -125,7 +125,8 @@ class OverlayView(context: Context) : View(context) {
 
                 for (w in widgets.sortedByDescending { it.zIndex }) {
                     val rect = widgetRectPx(w, data)
-                    if (rect.contains(px, py)) {
+                    val hit = hitRectPx(rect, w)
+                    if (hit.contains(px, py)) {
                         ThemeHolder.selectWidget(w.id)
                         draggedWidgetId = w.id; resizeCorner = null
                         dragOffsetX = px - rect.left; dragOffsetY = py - rect.top
@@ -137,9 +138,12 @@ class OverlayView(context: Context) : View(context) {
                 return true
             }
             MotionEvent.ACTION_MOVE -> {
+                val s = ThemeHolder.globalScale.coerceAtLeast(0.1f)
+                val ox = ThemeHolder.offsetX
+                val oy = ThemeHolder.offsetY
                 if (draggedWidgetId == "__all__") {
-                    val dx = (px - moveAllDragX) / density
-                    val dy = (py - moveAllDragY) / density
+                    val dx = (px - moveAllDragX) / density / s
+                    val dy = (py - moveAllDragY) / density / s
                     moveAllDragX = px; moveAllDragY = py
                     ThemeHolder.moveOffset(dx, dy)
                     debugText = "MOVEALL ${ThemeHolder.offsetX.toInt()},${ThemeHolder.offsetY.toInt()}"
@@ -153,12 +157,11 @@ class OverlayView(context: Context) : View(context) {
                     if (w == null) { debugText = "MOVE not found $id"; return false }
                     if (w !is Widget.Bar && w !is Widget.Graph && w !is Widget.Text
                         && w !is Widget.HLine && w !is Widget.VLine) return false
-
-                    val xDp = px / density; val yDp = py / density
+                    val xDp = px / density / s - ox
+                    val yDp = py / density / s - oy
                     val min = MIN_SIZE_DP
                     var nx = resizeOrigX; var ny = resizeOrigY
                     var nw = resizeOrigW; var nh = resizeOrigH
-
                     when (resizeCorner) {
                         "BR" -> { nw = (xDp - resizeOrigX).coerceAtLeast(min); nh = (yDp - resizeOrigY).coerceAtLeast(min) }
                         "BL" -> { nw = (resizeOrigX + resizeOrigW - xDp).coerceAtLeast(min); nx = resizeOrigX + resizeOrigW - nw; nh = (yDp - resizeOrigY).coerceAtLeast(min) }
@@ -168,8 +171,10 @@ class OverlayView(context: Context) : View(context) {
                     debugText = "RESIZE nx=${nx.toInt()} ny=${ny.toInt()} nw=${nw.toInt()} nh=${nh.toInt()}"
                     ThemeHolder.resizeWidget(id, snap(nx), snap(ny), snap(nw), snap(nh))
                 } else {
-                    val dpX = (px - dragOffsetX) / density
-                    val dpY = (py - dragOffsetY) / density
+                    val newLeftPx = px - dragOffsetX
+                    val newTopPx = py - dragOffsetY
+                    val dpX = newLeftPx / density / s - ox
+                    val dpY = newTopPx / density / s - oy
                     ThemeHolder.updateWidgetPosition(id, snap(dpX.coerceAtLeast(0f)), snap(dpY.coerceAtLeast(0f)))
                 }
                 return true
@@ -266,6 +271,15 @@ class OverlayView(context: Context) : View(context) {
         }
 
         postOnAnimation(refreshRunnable)
+    }
+
+    private fun hitRectPx(r: RectF, w: Widget): RectF {
+        val minHit = 12f * density
+        return when (w) {
+            is Widget.HLine -> RectF(r.left, r.centerY() - minHit, r.right, r.centerY() + minHit)
+            is Widget.VLine -> RectF(r.centerX() - minHit, r.top, r.centerX() + minHit, r.bottom)
+            else -> r
+        }
     }
 
     private fun widgetRectPx(w: Widget, data: Map<String, String>): RectF {

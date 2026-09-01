@@ -17,10 +17,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -299,9 +302,11 @@ fun MainApp(
                     Button(
                         onClick = {
                             if (isEditing) {
+                                val baked = ThemeHolder.bakedWidgets()
+                                ThemeHolder.consumeOffsetAndBake()
                                 ThemeHolder.setEditMode(false)
                                 ThemeHolder.selectWidget(null)
-                                activeTheme?.let { onSavePositions(it.copy(widgets = ThemeHolder.widgets.value)) }
+                                activeTheme?.let { onSavePositions(it.copy(widgets = baked)) }
                             } else {
                                 ThemeHolder.setEditMode(true)
                             }
@@ -312,13 +317,38 @@ fun MainApp(
                 Button(onClick = onSettings) { Text("\u2699") }
             }
             if (isEditing) {
+                var showSaveAs by remember { mutableStateOf(false) }
+                var newName by remember { mutableStateOf("") }
+                val ctx = androidx.compose.ui.platform.LocalContext.current
                 Row(
-                    modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 8.dp),
+                    modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 4.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Button(onClick = { ThemeHolder.undo() }, enabled = ThemeHolder.canUndo(), modifier = Modifier.weight(1f)) { Text("\u21A9") }
                     Button(onClick = { ThemeHolder.resetToOriginal() }, modifier = Modifier.weight(1f)) { Text("\u21BA") }
+                    Button(onClick = { showSaveAs = true; newName = (activeTheme?.name ?: "New") + " copy" }, modifier = Modifier.weight(1f)) { Text("Save as") }
                     Button(onClick = { ThemeHolder.setEditMode(false); ThemeHolder.selectWidget(null) }, modifier = Modifier.weight(1f)) { Text("Cancel") }
+                }
+                if (showSaveAs) {
+                    AlertDialog(
+                        onDismissRequest = { showSaveAs = false },
+                        title = { Text("Save as new Conky") },
+                        text = { OutlinedTextField(value = newName, onValueChange = { newName = it }, label = { Text("Name") }, singleLine = true) },
+                        confirmButton = {
+                            TextButton(onClick = {
+                                if (newName.isNotBlank()) {
+                                    val baked = ThemeHolder.bakedWidgets()
+                                    val base = activeTheme
+                                    val newTheme = (base?.copy(name = newName.trim(), widgets = baked) ?: Theme(name = newName.trim(), widgets = baked))
+                                    repo.save(newTheme.name, ThemeLoader().toJson(newTheme))
+                                    onRefresh()
+                                    android.widget.Toast.makeText(ctx, "Saved as ${newTheme.name}", android.widget.Toast.LENGTH_SHORT).show()
+                                    showSaveAs = false
+                                }
+                            }) { Text("Save") }
+                        },
+                        dismissButton = { TextButton(onClick = { showSaveAs = false }) { Text("Cancel") } },
+                    )
                 }
             }
         }

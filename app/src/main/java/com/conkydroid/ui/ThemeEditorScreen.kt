@@ -1,6 +1,7 @@
 package com.conkydroid.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -23,6 +25,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -41,13 +44,16 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.conkydroid.engine.Widget
@@ -64,8 +70,25 @@ fun ThemeEditorScreen(
     var editTheme by remember { mutableStateOf(theme) }
     var editWidget by remember { mutableStateOf<Widget?>(null) }
     var showAddMenu by remember { mutableStateOf(false) }
+    var showSaveAs by remember { mutableStateOf(false) }
+    var saveAsName by remember { mutableStateOf(theme.name + " copy") }
+    var draggedId by remember { mutableStateOf<String?>(null) }
+    val listState = rememberLazyListState()
 
     fun preview() = onPreview(editTheme)
+
+    fun genId(prefix: String): String {
+        return "${prefix}_${System.currentTimeMillis() % 100000}_${(0..999).random()}"
+    }
+
+    fun move(from: Int, to: Int) {
+        if (from == to) return
+        val list = editTheme.widgets.toMutableList()
+        val item = list.removeAt(from)
+        list.add(to.coerceIn(0, list.size), item)
+        editTheme = editTheme.copy(widgets = list)
+        preview()
+    }
 
     Scaffold(
         topBar = {
@@ -79,6 +102,9 @@ fun ThemeEditorScreen(
                 actions = {
                     IconButton(onClick = { preview() }) {
                         Icon(Icons.Default.Star, contentDescription = "Preview")
+                    }
+                    IconButton(onClick = { showSaveAs = true }) {
+                        Icon(Icons.Default.Add, contentDescription = "Save as new")
                     }
                     IconButton(onClick = { onSave(editTheme) }) {
                         Icon(Icons.Default.Edit, contentDescription = "Save")
@@ -100,7 +126,7 @@ fun ThemeEditorScreen(
                         onClick = {
                             editTheme = editTheme.copy(
                                 widgets = editTheme.widgets + Widget.Text(
-                                    id = "text_${editTheme.widgets.size}",
+                                    id = genId("text"),
                                     x = 20f, y = 40f, format = "New text", fontSize = 14f,
                                 )
                             )
@@ -112,7 +138,7 @@ fun ThemeEditorScreen(
                         onClick = {
                             editTheme = editTheme.copy(
                                 widgets = editTheme.widgets + Widget.Bar(
-                                    id = "bar_${editTheme.widgets.size}",
+                                    id = genId("bar"),
                                     x = 20f, y = 100f, width = 200f, height = 10f,
                                     source = "cpu_raw",
                                 )
@@ -125,7 +151,7 @@ fun ThemeEditorScreen(
                         onClick = {
                             editTheme = editTheme.copy(
                                 widgets = editTheme.widgets + Widget.Graph(
-                                    id = "graph_${editTheme.widgets.size}",
+                                    id = genId("graph"),
                                     x = 20f, y = 120f, width = 280f, height = 60f,
                                     source = "cpu_raw",
                                 )
@@ -138,7 +164,7 @@ fun ThemeEditorScreen(
                         onClick = {
                             editTheme = editTheme.copy(
                                 widgets = editTheme.widgets + Widget.HLine(
-                                    id = "hline_${editTheme.widgets.size}",
+                                    id = genId("hline"),
                                     x = 10f, y = 50f, length = 200f, color = 0xFFFFFFFF.toInt(),
                                 )
                             )
@@ -150,7 +176,7 @@ fun ThemeEditorScreen(
                         onClick = {
                             editTheme = editTheme.copy(
                                 widgets = editTheme.widgets + Widget.VLine(
-                                    id = "vline_${editTheme.widgets.size}",
+                                    id = genId("vline"),
                                     x = 100f, y = 10f, length = 200f, color = 0xFFFFFFFF.toInt(),
                                 )
                             )
@@ -162,37 +188,54 @@ fun ThemeEditorScreen(
         },
     ) { padding ->
         LazyColumn(
+            state = listState,
             modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             item {
-                Text("${editTheme.widgets.size} widgets  •  tap to reorder", style = MaterialTheme.typography.bodySmall)
+                Text("${editTheme.widgets.size} widgets  •  long-press ☰ to drag, tap to reorder", style = MaterialTheme.typography.bodySmall)
                 Spacer(Modifier.height(8.dp))
             }
 
-            itemsIndexed(editTheme.widgets) { index, widget ->
+            itemsIndexed(editTheme.widgets, key = { _, w -> w.id }) { index, widget ->
+                var dragAccum by remember { mutableFloatStateOf(0f) }
+                val isDragging = draggedId == widget.id
                 WidgetCard(
+                    modifier = Modifier
+                        .animateItem()
+                        .then(if (isDragging) Modifier.shadow(8.dp, CardDefaults.shape) else Modifier)
+                        .pointerInput(widget.id) {
+                            detectDragGesturesAfterLongPress(
+                                onDragStart = {
+                                    draggedId = widget.id
+                                    dragAccum = 0f
+                                },
+                                onDragEnd = { draggedId = null; dragAccum = 0f },
+                                onDragCancel = { draggedId = null; dragAccum = 0f },
+                                onDrag = { change, dragAmount ->
+                                    change.consume()
+                                    dragAccum += dragAmount.y
+                                    val threshold = 56.dp.toPx()
+                                    if (dragAccum > threshold && index < editTheme.widgets.size - 1) {
+                                        move(index, index + 1)
+                                        dragAccum = 0f
+                                    } else if (dragAccum < -threshold && index > 0) {
+                                        move(index, index - 1)
+                                        dragAccum = 0f
+                                    }
+                                }
+                            )
+                        },
                     index = index,
                     widget = widget,
                     total = editTheme.widgets.size,
+                    isDragging = isDragging,
                     onEdit = { editWidget = widget },
                     onMoveUp = {
-                        if (index > 0) {
-                            val list = editTheme.widgets.toMutableList()
-                            val moved = list.removeAt(index)
-                            list.add(index - 1, moved)
-                            editTheme = editTheme.copy(widgets = list)
-                            preview()
-                        }
+                        if (index > 0) move(index, index - 1)
                     },
                     onMoveDown = {
-                        if (index < editTheme.widgets.size - 1) {
-                            val list = editTheme.widgets.toMutableList()
-                            val moved = list.removeAt(index)
-                            list.add(index + 1, moved)
-                            editTheme = editTheme.copy(widgets = list)
-                            preview()
-                        }
+                        if (index < editTheme.widgets.size - 1) move(index, index + 1)
                     },
                     onDelete = {
                         editTheme = editTheme.copy(
@@ -203,6 +246,29 @@ fun ThemeEditorScreen(
                 )
             }
         }
+    }
+
+    if (showSaveAs) {
+        AlertDialog(
+            onDismissRequest = { showSaveAs = false },
+            title = { Text("Save as new Conky") },
+            text = {
+                Column {
+                    Text("Speichert aktuelle Widgets als neuen Conky")
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(value = saveAsName, onValueChange = { saveAsName = it }, label = { Text("Name") }, singleLine = true)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (saveAsName.isNotBlank()) {
+                        onSave(editTheme.copy(name = saveAsName.trim()))
+                        showSaveAs = false
+                    }
+                }) { Text("Save") }
+            },
+            dismissButton = { TextButton(onClick = { showSaveAs = false }) { Text("Cancel") } },
+        )
     }
 
     editWidget?.let { w ->
@@ -222,22 +288,29 @@ fun ThemeEditorScreen(
 
 @Composable
 private fun WidgetCard(
+    modifier: Modifier = Modifier,
     index: Int,
     widget: Widget,
     total: Int,
+    isDragging: Boolean = false,
     onEdit: () -> Unit,
     onMoveUp: () -> Unit,
     onMoveDown: () -> Unit,
     onDelete: () -> Unit,
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isDragging) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isDragging) 8.dp else 0.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            Icon(Icons.Default.Menu, contentDescription = "Drag handle", modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.width(6.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     TypeBadge(widget)
